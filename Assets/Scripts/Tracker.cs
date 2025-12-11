@@ -24,15 +24,15 @@ public class Tracker : MonoBehaviour
         lastPosition = transform.position;
     }
 
-    //void OnDrawGizmos()
-    //{
-    //    if (!Application.isPlaying) return;
+    void OnDrawGizmos()
+    {
+        if (!Application.isPlaying) return;
 
-    //    Gizmos.color = Color.red;
-    //    Gizmos.DrawLine(transform.position, transform.position + worldVelocity);
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position + worldVelocity);
 
-    //    Gizmos.color = Color.blue;
-    //    Gizmos.DrawLine(transform.position, transform.position + transform.forward * 0.5f);
-    //}
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(transform.position, transform.position + transform.forward * 0.5f);
+    }
 
 }

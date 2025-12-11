@@ -8,7 +8,7 @@ public class Grid : FiniteGraph<GridCell, CellConnection, GridConnections>
 {
     public int width;
 	public int height;
-	public float obstacleProbability = 0.2f;
+	public float obstacleProbability = 0.1f;
 
 	public GridCell[,] cells;
 

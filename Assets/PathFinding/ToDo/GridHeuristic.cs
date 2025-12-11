@@ -6,19 +6,22 @@ using PathFinding;
 
 public class GridHeuristic : Heuristic<GridCell>
 {
-	// Class that represents a Heuristic function to estimate the cost of going from 
-	// one GridCell to another
+    public float densityPenalty = 1.5f;
+    // Class that represents a Heuristic function to estimate the cost of going from 
+    // one GridCell to another
 
-	
-	// constructor takes a goal node for estimating
-	public GridHeuristic(GridCell goal):base(goal){
+
+    // constructor takes a goal node for estimating
+    public GridHeuristic(GridCell goal):base(goal){
 		goalNode = goal;
 	}
 	
 	 // generates an estimated cost to reach the stored goal from the given node
 	public override float estimateCost(GridCell fromNode){
-		return Mathf.Sqrt((fromNode.gridPos.x - goalNode.gridPos.x) * (fromNode.gridPos.x - goalNode.gridPos.x) +
-			(fromNode.gridPos.y - goalNode.gridPos.y) * (fromNode.gridPos.y - goalNode.gridPos.y));
+        float penalty = fromNode.agentCount * densityPenalty;
+        return Mathf.Sqrt((fromNode.gridPos.x - goalNode.gridPos.x) * (fromNode.gridPos.x - goalNode.gridPos.x) +
+			(fromNode.gridPos.y - goalNode.gridPos.y) * (fromNode.gridPos.y - goalNode.gridPos.y))
+			+ penalty;
 	}
 
 	// determines if the goal node has been reached by node

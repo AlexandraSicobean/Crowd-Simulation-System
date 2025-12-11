@@ -89,9 +89,6 @@ PrefabInstance:
       addedObject: {fileID: 6686083471037713078}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 13a2fadb51ed98446b30af4146474266, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 570952965871883425}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 13a2fadb51ed98446b30af4146474266, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 7407140417284192945}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 13a2fadb51ed98446b30af4146474266, type: 3}
       insertIndex: -1
@@ -170,21 +167,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goal: {x: 0, y: 0, z: 0}
   speed: 2
---- !u!114 &570952965871883425
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 159995609095679165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3694dc41981272f4387600c626a22cf3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  goal: {x: 0, y: 0, z: 0}
-  worldSize: 10
-  reachThreshold: 0.5
+  gridManager: {fileID: 0}
 --- !u!54 &7407140417284192945
 Rigidbody:
   m_ObjectHideFlags: 0

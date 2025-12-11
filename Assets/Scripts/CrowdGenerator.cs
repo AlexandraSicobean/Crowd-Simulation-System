@@ -1,13 +1,25 @@
 using UnityEngine;
+using System.Collections;
 
 public class CrowdGenerator : MonoBehaviour
 {
     public GameObject agentPrefab;
+    public GridManager gridManager;
     public int agentCount = 10;
     public float spawnRadius = 8f;
 
     void Start()
     {
+        StartCoroutine(DelayedGenerate());
+    }
+
+    IEnumerator DelayedGenerate()
+    {
+        yield return null;
+
+        if (gridManager == null)
+            gridManager = FindFirstObjectByType<GridManager>();
+
         GenerateCrowd();
     }
 
@@ -15,8 +27,11 @@ public class CrowdGenerator : MonoBehaviour
     {
         for (int i = 0; i < agentCount; i++)
         {
-            Vector3 pos = GetValidRandomPosition();
+            GridCell spawnCell = gridManager.GetRandomFreeCell();
+            Vector3 pos = spawnCell.GetWorldPosition(gridManager.gridOrigin);
             Agent agent = Instantiate(agentPrefab, pos, Quaternion.identity).GetComponent<Agent>();
+            agent.gridManager = FindFirstObjectByType<GridManager>();
+            agent.grid = agent.gridManager.grid;
             Simulator.GetInstance().AddAgent(agent);
         }
     }

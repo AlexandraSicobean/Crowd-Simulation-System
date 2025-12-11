@@ -9,9 +9,9 @@ public class GridManager : MonoBehaviour
     public Grid grid;
     public int width = 20;
     public int height = 20;
+    public Vector3 gridOrigin = Vector3.zero;
 
     private Dictionary<GridCell, GameObject> cellToCube;
-
 
     void Start()
     {
@@ -19,8 +19,8 @@ public class GridManager : MonoBehaviour
         grid.Initialize(width, height);
 
         Draw();
-        //TestAStar();
-        TestBidirectionalAStar();
+        TestAStar();
+        //TestBidirectionalAStar();
     }
 
     void Draw()
@@ -33,7 +33,7 @@ public class GridManager : MonoBehaviour
             {
                 GridCell cell = grid.cells[x, y];
 
-                Vector3 pos = new Vector3(x, 0, y);
+                Vector3 pos = gridOrigin + new Vector3(x, 0, y);
                 GameObject cube = Instantiate(cellPrefab, pos, Quaternion.identity);
 
                 cube.GetComponent<Renderer>().material.color =
@@ -44,6 +44,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    
     public void TestAStar()
     {
         Debug.Log("<color=yellow>Running A*</color>");
@@ -69,7 +70,7 @@ public class GridManager : MonoBehaviour
             Debug.Log("<color=red>No path found by A*</color>");
         }
     }
-
+    /*
     public void TestBidirectionalAStar()
     {
         Debug.Log("<color=cyan>Running Bidirectional A*</color>");
@@ -94,7 +95,7 @@ public class GridManager : MonoBehaviour
             Debug.Log("<color=red>Bidirectional A* found NO path</color>");
         }
     }
-
+    */
     public void DrawPath(List<GridCell> path)
     {
         // Reset all colors
@@ -104,7 +105,7 @@ public class GridManager : MonoBehaviour
             GameObject cube = entry.Value;
 
             cube.GetComponent<Renderer>().material.color =
-                cell.isObstacle ? Color.black : Color.white;
+                cell.isObstacle ? Color.black : Color.gray;
         }
 
         // Color path
@@ -118,6 +119,65 @@ public class GridManager : MonoBehaviour
         cellToCube[path[0]].GetComponent<Renderer>().material.color = Color.green;
         cellToCube[path[path.Count - 1]].GetComponent<Renderer>().material.color = Color.red;
     }
+    
 
+    public GridCell GetClosestCell(Vector3 worldPos)
+    {
+        Vector3 local = worldPos - gridOrigin;
 
+        int x = Mathf.Clamp(Mathf.RoundToInt(local.x), 0, width - 1);
+        int y = Mathf.Clamp(Mathf.RoundToInt(local.z), 0, height - 1);
+
+        return grid.cells[x, y];
+    }
+
+    public GridCell GetRandomFreeCell()
+    {
+        while (true)
+        {
+            int x = Random.Range(0, width);
+            int y = Random.Range(0, height);
+
+            GridCell cell = grid.cells[x, y];
+            if (!cell.isObstacle)
+                return cell;
+        }
+    }
+
+    public GridCell GetClosestFreeCell(Vector3 worldPos)
+    {
+        Vector3 local = worldPos - gridOrigin;
+
+        int sx = Mathf.RoundToInt(local.x);
+        int sy = Mathf.RoundToInt(local.z);
+
+        int startX = Mathf.Clamp(sx, 0, width - 1);
+        int startY = Mathf.Clamp(sy, 0, height - 1);
+
+        // If already free:
+        if (!grid.cells[startX, startY].isObstacle)
+            return grid.cells[startX, startY];
+
+        // Search outward until any free cell is found
+        for (int r = 1; r < Mathf.Max(width, height); r++)
+        {
+            for (int dx = -r; dx <= r; dx++)
+            {
+                for (int dy = -r; dy <= r; dy++)
+                {
+                    int nx = startX + dx;
+                    int ny = startY + dy;
+
+                    if (nx < 0 || ny < 0 || nx >= width || ny >= height)
+                        continue;
+
+                    if (!grid.cells[nx, ny].isObstacle)
+                        return grid.cells[nx, ny];
+                }
+            }
+        }
+
+        // Absolute fallback
+        return grid.cells[startX, startY];
+    }
 }
