@@ -28,7 +28,7 @@ public class Tracker : MonoBehaviour
     {
         if (!Application.isPlaying) return;
 
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.green;
         Gizmos.DrawLine(transform.position, transform.position + worldVelocity);
 
         Gizmos.color = Color.blue;

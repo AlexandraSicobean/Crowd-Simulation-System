@@ -42,17 +42,20 @@ public class Simulator : MonoBehaviour
             if (desiredDir == Vector3.zero) continue;
 
             Vector3 force = Vector3.zero;
-            force += Seek(a, desiredDir) + 2.0f * AvoidObstacles(a) + 3.0f * AvoidAgents(a);
+            //force += Seek(a, desiredDir) + 2.0f * AvoidObstacles(a) + 3.0f * AvoidAgents(a);
+            force += Seek(a, desiredDir);
 
-            float maxForce = 10f;
+            float maxForce = 12f;
             if (force.magnitude > maxForce)
                 force = force.normalized * maxForce;
             a.velocity += force * dt;
 
+
             if (a.velocity.magnitude > a.speed)
                 a.velocity = a.velocity.normalized * a.speed;
 
-            rb.MovePosition(rb.position + a.velocity * dt);
+            //rb.MovePosition(rb.position + a.velocity * dt);
+            a.transform.position += a.velocity * dt;
             a.UpdateCellOccupation();
         }
     }

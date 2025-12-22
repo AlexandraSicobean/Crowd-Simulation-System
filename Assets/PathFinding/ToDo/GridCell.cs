@@ -44,8 +44,13 @@ public class GridCell : Node
 
     public Vector3 GetWorldPosition(Vector3 origin)
     {
-        return origin + new Vector3(gridPos.x, 0, gridPos.y);
+        return origin + new Vector3(
+            gridPos.x + 0.5f,
+            0,
+            gridPos.y + 0.5f
+        );
     }
+
 
 
     // Your class that represents a grid cell node derives from Node

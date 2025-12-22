@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using PathFinding;
@@ -6,7 +6,7 @@ using PathFinding;
 public class Agent : MonoBehaviour
 {
     public Vector3 goal;
-    public float speed = 2f;
+    public float speed = 0.5f;
 
     public GridManager gridManager;
     public Grid grid;
@@ -30,7 +30,6 @@ public class Agent : MonoBehaviour
 
         RequestNewPath();
     }
-
 
     public void RequestNewPath()
     {
@@ -65,43 +64,30 @@ public class Agent : MonoBehaviour
         if (path == null || path.Count == 0 || pathIndex >= path.Count)
             return Vector3.zero;
 
-        Vector3 waypoint = path[pathIndex].GetWorldPosition(gridManager.gridOrigin);
-        Vector3 toWaypoint = waypoint - transform.position;
-        toWaypoint.y = 0;
+        Vector3 target = path[pathIndex].GetWorldPosition(gridManager.gridOrigin);
+        Vector3 toTarget = target - transform.position;
+        toTarget.y = 0f;
 
-        if (toWaypoint.magnitude < waypointThreshold)
+        if (toTarget.magnitude < waypointThreshold)
         {
             pathIndex++;
+
             if (pathIndex >= path.Count)
             {
                 RequestNewPath();
                 return Vector3.zero;
             }
 
-            waypoint = path[pathIndex].GetWorldPosition(gridManager.gridOrigin);
-            toWaypoint = waypoint - transform.position;
-            toWaypoint.y = 0;
+            target = path[pathIndex].GetWorldPosition(gridManager.gridOrigin);
+            toTarget = target - transform.position;
+            toTarget.y = 0f;
         }
 
-        if (Time.time - lastMoveTime > 3f) 
-        {
-            stuckCounter++;
-            if (stuckCounter > 10)
-            {
-                RequestNewPath();
-                stuckCounter = 0;
-                return Vector3.zero;
-            }
-        }
-        else
-        {
-            stuckCounter = 0;
-        }
-        if (toWaypoint.magnitude > waypointThreshold)
-            lastMoveTime = Time.time;
+        DrawPathWorld(path, gridManager.gridOrigin);
 
-        return toWaypoint.normalized;
+        return toTarget.normalized;
     }
+
 
     public void UpdateCellOccupation()
     {
@@ -117,4 +103,16 @@ public class Agent : MonoBehaviour
         }
     }
 
+    // [DEBUG]
+    void DrawPathWorld(List<GridCell> path, Vector3 origin)
+    {
+        if (path == null || path.Count < 2) return;
+
+        for (int i = 0; i < path.Count - 1; i++)
+        {
+            Vector3 a = path[i].GetWorldPosition(origin);
+            Vector3 b = path[i + 1].GetWorldPosition(origin);
+            Debug.DrawLine(a, b, Color.cyan, 0f);
+        }
+    }
 }
