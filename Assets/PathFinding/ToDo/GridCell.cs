@@ -21,7 +21,6 @@ public class GridCell : Node
 		this.isObstacle = n.isObstacle;
 	}
 
-	// Spawns a new cube in the scene
 	public void SetVisual (GameObject prefab, Transform parent)
 	{
 		visual = GameObject.Instantiate(prefab, parent);
@@ -29,7 +28,6 @@ public class GridCell : Node
 		UpdateColor();
 	}
 
-	// Change color of the cube (black = obstacle, white = not obstacle)
     public void UpdateColor()
     {
         if (visual == null) return;
@@ -50,26 +48,4 @@ public class GridCell : Node
             gridPos.y + 0.5f
         );
     }
-
-
-
-    // Your class that represents a grid cell node derives from Node
-
-    // You add any data needed to represent a grid cell node
-
-    // EXAMPLE DATA
-    /*
-	protected float xMin;
-	protected float xMax;
-	protected float zMin;
-	protected float zMax;
-
-	protected bool occupied;
-
-	protected Vector3 center;
-	*/
-
-    // You also add any constructors and methods to implement your grid cell node class
-
-    // TO IMPLEMENT
 };

@@ -15,10 +15,13 @@ public class Tracker : MonoBehaviour
 
     void Update()
     {
+        // Compute displacement since last frame
         Vector3 displacement = transform.position - lastPosition;
 
+        // Compute velocity in world and local space
         worldVelocity = displacement / Time.deltaTime;
         localVelocity = transform.InverseTransformDirection(worldVelocity);
+
         speed = worldVelocity.magnitude;
 
         lastPosition = transform.position;
@@ -28,9 +31,11 @@ public class Tracker : MonoBehaviour
     {
         if (!Application.isPlaying) return;
 
+        // World velocity - green
         Gizmos.color = Color.green;
         Gizmos.DrawLine(transform.position, transform.position + worldVelocity);
 
+        // Direction - blue
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, transform.position + transform.forward * 0.5f);
     }

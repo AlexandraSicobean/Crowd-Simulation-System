@@ -4,9 +4,11 @@ using System.Collections;
 public class CrowdGenerator : MonoBehaviour
 {
     public GameObject agentPrefab;
-    public GridManager gridManager;
     public int agentCount = 10;
     public float spawnRadius = 8f;
+
+    public GridManager gridManager;
+    public bool useGrid = false;
 
     void Start()
     {
@@ -25,13 +27,28 @@ public class CrowdGenerator : MonoBehaviour
 
     void GenerateCrowd()
     {
+        // Different Simulators depending on the scene
+        if (useGrid)
+            Simulator.GetInstance().mode = Simulator.SimulationMode.Steering;
+
         for (int i = 0; i < agentCount; i++)
         {
-            GridCell spawnCell = gridManager.GetRandomFreeCell();
-            Vector3 pos = spawnCell.GetWorldPosition(gridManager.gridOrigin);
+            Vector3 pos;
+            if (useGrid)
+            {
+                GridCell spawnCell = gridManager.GetRandomFreeCell();
+                pos = spawnCell.GetWorldPosition(gridManager.gridOrigin);
+            }
+            else
+                pos = GetValidRandomPosition();
+
             Agent agent = Instantiate(agentPrefab, pos, Quaternion.identity).GetComponent<Agent>();
-            agent.gridManager = FindFirstObjectByType<GridManager>();
-            agent.grid = agent.gridManager.grid;
+
+            if (useGrid)
+            {
+                agent.gridManager = FindFirstObjectByType<GridManager>();
+                agent.grid = agent.gridManager.grid;
+            }
             Simulator.GetInstance().AddAgent(agent);
         }
     }

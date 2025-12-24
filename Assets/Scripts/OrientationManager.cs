@@ -14,6 +14,7 @@ public class OrientationManager : MonoBehaviour
 
     void Update()
     {
+        // Fix orientation
         if (Input.GetKeyDown(KeyCode.F))
             fixedOrientation = !fixedOrientation;
 

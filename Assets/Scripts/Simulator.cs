@@ -4,17 +4,32 @@ using System.Collections.Generic;
 public class Simulator : MonoBehaviour
 {
     public static Simulator _instance = null;
+    public bool useSteering = false;
 
     public static Simulator GetInstance()
     {
         if (_instance == null)
         {
-            GameObject simObj = new GameObject("Simulator");
-            _instance = simObj.AddComponent<Simulator>();
+            _instance = FindFirstObjectByType<Simulator>();
+
+            if (_instance == null)
+            {
+                GameObject simObj = new GameObject("Simulator");
+                _instance = simObj.AddComponent<Simulator>();
+            }
         }
         return _instance;
     }
 
+
+    public enum SimulationMode
+    {
+        CollisionAvoidance,     // Lab 2
+        PathFollowing,          // Lab 3
+        Steering                // Lab 4
+    }
+
+    public SimulationMode mode = SimulationMode.CollisionAvoidance;
     private List<Agent> agents = new List<Agent>();
 
     public void AddAgent(Agent a)
@@ -35,36 +50,101 @@ public class Simulator : MonoBehaviour
         {
             if (a == null) continue;
 
-            Rigidbody rb = a.GetComponent<Rigidbody>();
-
-            Vector3 desiredDir = a.GetDirection();
-
-            if (desiredDir == Vector3.zero) continue;
-
-            Vector3 force = Vector3.zero;
-            //force += Seek(a, desiredDir) + 2.0f * AvoidObstacles(a) + 3.0f * AvoidAgents(a);
-            force += Seek(a, desiredDir);
-
-            float maxForce = 12f;
-            if (force.magnitude > maxForce)
-                force = force.normalized * maxForce;
-            a.velocity += force * dt;
-
-
-            if (a.velocity.magnitude > a.speed)
-                a.velocity = a.velocity.normalized * a.speed;
-
-            //rb.MovePosition(rb.position + a.velocity * dt);
-            a.transform.position += a.velocity * dt;
-            a.UpdateCellOccupation();
+            switch (mode)
+            {
+                case SimulationMode.CollisionAvoidance:
+                    UpdateCollisionAvoidance(a, dt);
+                    break;
+                case SimulationMode.PathFollowing:
+                    UpdatePathFollowing(a, dt); 
+                    break;
+                case SimulationMode.Steering:
+                    UpdateSteering(a, dt); 
+                    break;
+            }
         }
     }
+
+    void UpdateCollisionAvoidance(Agent a, float dt)
+    {
+        Vector3 desiredDir = a.goal - a.transform.position;
+        desiredDir.y = 0f;
+
+        if (desiredDir.magnitude  < a.goalThreshold)
+        {
+            a.AssignNewRandomGoal();
+        }
+
+        Vector3 desiredVel = desiredDir.normalized * a.speed;
+        a.velocity = desiredVel;
+
+        Rigidbody rb = a.GetComponent<Rigidbody>();
+        if (rb != null)
+            rb.MovePosition(rb.position + a.velocity * dt);
+        else
+            a.transform.position += a.velocity * dt;
+    }
+
+    void UpdatePathFollowing(Agent a, float dt)
+    {
+        Vector3 target = a.GetCurrentWaypointWorld();
+        Vector3 dir = target - a.transform.position;
+        dir.y = 0f;
+
+        if (dir.magnitude < a.waypointThreshold)
+            return;
+
+        a.velocity = dir.normalized * a.speed;
+        a.transform.position += a.velocity * dt;
+    }
+
+    public float arriveWeight = 1.0f;
+    public float agentAvoidanceWeight = 1.0f;
+    public float obstacleWeight = 3.0f;
+    void UpdateSteering(Agent a, float dt)
+    {
+        Vector3 desiredDir = a.GetDirection();
+
+        Vector3 force = Vector3.zero;
+        Vector3 target = a.GetCurrentWaypointWorld();
+        force += obstacleWeight * AvoidObstacles(a);
+        force += agentAvoidanceWeight * AvoidAgents(a);
+        force += arriveWeight * Arrive(a, target);
+
+        if (force.magnitude > a.maxForce)
+            force = force.normalized * a.maxForce;
+        a.velocity += force * dt;
+
+        a.transform.position += a.velocity * dt;
+        a.UpdateCellOccupation();
+    }
+
 
     public Vector3 Seek(Agent a, Vector3 desiredDir)
     {
         Vector3 desiredVelocity = desiredDir * a.speed;
         return desiredVelocity - a.velocity;
     }
+
+    public Vector3 Arrive(Agent a, Vector3 target)
+    {
+        Vector3 dir = target - a.transform.position;
+        dir.y = 0f;
+
+        float d = dir.magnitude;
+        if (d < 0.001f)
+            return Vector3.zero;
+
+        float slowingDistance = 1f;
+
+        float rampedSpeed = a.speed * (d / slowingDistance);
+        float clippedSpeed = Mathf.Min(rampedSpeed, a.speed);
+
+        Vector3 desiredVelocity = dir * (clippedSpeed / d);
+
+        return desiredVelocity - a.velocity;
+    }
+
 
     public Vector3 AvoidObstacles(Agent a)
     {
