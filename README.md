@@ -10,7 +10,7 @@ The system contains:
 - Density-aware navigation heuristics
 - Runtime algorithm switching
 
-(Watch Ddemo here)[https://www.youtube.com/watch?v=DYZqLUq948U]
+[Watch demo here](https://www.youtube.com/watch?v=DYZqLUq948U)
 
 ## Project Overview
 
